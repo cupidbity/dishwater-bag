@@ -1,0 +1,14 @@
+{
+  "name": "dishwater-bag",
+  "version": "1.0.0",
+  "description": "catch falling cats in a paper bag",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
+  }
+}

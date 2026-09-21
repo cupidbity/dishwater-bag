@@ -1,0 +1,13 @@
+node_modules
+dist
+
+.git
+.gitignore
+.vercelignore
+.DS_Store
+
+README.md
+supabase-schema.sql
+package.json
+package-lock.json
+vite.config.js

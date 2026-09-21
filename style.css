@@ -1,0 +1,242 @@
+@font-face {
+  font-family: "rainyhearts";
+  src: url("assets/rainyhearts.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --hud-height: 52px;
+
+  /* every colour below is lifted from assets/background.png */
+  --sand: #ddbc94;
+  --cream: #f4e6d6;
+  --gold: #f9c05f;
+
+  --page-background: #38261c;
+  --page-glow: #5a3f2e;
+  --frame-background: #4a3426;
+  --hud-background: rgba(40, 27, 20, 0.5);
+  --overlay-background: rgba(56, 38, 28, 0.9);
+  --text-color: var(--cream);
+  --accent-color: var(--gold);
+  --button-text: #4a3226;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 0%, var(--page-glow), var(--page-background) 70%);
+  padding: 12px;
+  color: var(--text-color);
+  font-family: "rainyhearts", "Trebuchet MS", sans-serif;
+  user-select: none;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.game-frame {
+  position: relative;
+  width: min(
+    calc(100vw - 24px),
+    calc((100vh - 24px - var(--hud-height)) * 640 / 720)
+  );
+  background: var(--frame-background);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(28, 18, 12, 0.6);
+}
+
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--hud-height);
+  padding: 0 18px;
+  font-size: 22px;
+  letter-spacing: 1px;
+  background: var(--hud-background);
+}
+
+.hud-item b {
+  color: var(--accent-color);
+  margin-left: 6px;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--sand);
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+  background: var(--overlay-background);
+  backdrop-filter: blur(3px);
+}
+
+.overlay.hidden,
+.hidden {
+  display: none;
+}
+
+.overlay {
+  overflow-y: auto;
+}
+
+.leaderboard {
+  width: min(300px, 100%);
+  margin-top: 6px;
+}
+
+.leaderboard-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: var(--accent-color);
+}
+
+.leaderboard-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 2px 8px;
+  font-size: 19px;
+  border-radius: 6px;
+}
+
+.leaderboard-row.is-you {
+  background: rgba(249, 192, 95, 0.16);
+  color: var(--accent-color);
+}
+
+.leaderboard-rank {
+  opacity: 0.55;
+  text-align: right;
+}
+
+.leaderboard-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.leaderboard-score {
+  color: var(--accent-color);
+}
+
+.leaderboard-row.is-you .leaderboard-score {
+  color: inherit;
+}
+
+.leaderboard-note {
+  margin: 6px 0 0;
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+.name-overlay {
+  z-index: 2;
+}
+
+.name-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.name-input {
+  width: min(260px, 80vw);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 22px;
+  text-align: center;
+  color: var(--text-color);
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(244, 230, 214, 0.35);
+  border-radius: 10px;
+}
+
+.name-input::placeholder {
+  color: var(--text-color);
+  opacity: 0.4;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.title-cat {
+  display: block;
+  width: 190px;
+  height: 180px;
+  image-rendering: pixelated;
+}
+
+.overlay h1 {
+  margin: 0;
+  font-size: 54px;
+  color: var(--accent-color);
+}
+
+.overlay p {
+  margin: 0;
+  max-width: 360px;
+  font-size: 20px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+
+.overlay-keys {
+  font-size: 17px;
+  opacity: 0.6;
+}
+
+button {
+  margin-top: 12px;
+  padding: 12px 34px;
+  font: inherit;
+  font-size: 24px;
+  color: var(--button-text);
+  background: var(--accent-color);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
