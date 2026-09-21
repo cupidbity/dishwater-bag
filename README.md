@@ -4,6 +4,8 @@ catch falling cats in a paper bag. miss three and it's over.
 
 a small browser game, plain html + css + javascript on a canvas
 
+avaliable to play at https://dishwater-bag.vercel.app/
+
 ## running it yourself
 
 ```
