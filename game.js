@@ -24,6 +24,11 @@ const bagFrames = [1, 2, 3, 4, 5].map((frameNumber) => loadImage(`bag - ${frameN
 const poopFrames = [loadImage("poop.png")];
 const idleFrames = [1, 2, 3].map((frameNumber) => loadImage(`idle - ${frameNumber}.png`));
 
+const backgroundMusic = new Audio("assets/" + encodeURIComponent("Dih.m4a"));
+backgroundMusic.loop = true;
+backgroundMusic.preload = "auto";
+backgroundMusic.volume = 0.5;
+
 // whole number, so every source pixel stays a crisp square
 const BACKGROUND_SCALE = 8;
 const FALLING_FRAMES_PER_SECOND = 10;
@@ -73,6 +78,7 @@ const PALETTE = {
 };
 
 const BEST_SCORE_STORAGE_KEY = "dishwaterBagBestScore";
+const MUTED_STORAGE_KEY = "dishwaterBagMuted";
 const STARTING_LIVES = 3;
 const PLAYER_SPEED = 560;
 const BASE_FALL_SPEED = 170;
@@ -133,6 +139,7 @@ let lastFrameTimestamp = 0;
 let menuAnimationTime = 0;
 
 bestValueElement.textContent = bestScore;
+backgroundMusic.muted = loadMuted();
 
 function loadBestScore() {
   try {
@@ -148,6 +155,33 @@ function saveBestScore(value) {
   } catch (storageError) {
     // storage may be blocked, the game still works without it
   }
+}
+
+function loadMuted() {
+  try {
+    return localStorage.getItem(MUTED_STORAGE_KEY) === "true";
+  } catch (storageError) {
+    return false;
+  }
+}
+
+function saveMuted(value) {
+  try {
+    localStorage.setItem(MUTED_STORAGE_KEY, String(value));
+  } catch (storageError) {
+    // storage may be blocked, mute just won't be remembered next visit
+  }
+}
+
+// browsers reject play() until the page has had a click or key press, which
+// every call site here comes from, but swallow the rejection just in case
+function playMusic() {
+  backgroundMusic.play().catch(() => {});
+}
+
+function toggleMuted() {
+  backgroundMusic.muted = !backgroundMusic.muted;
+  saveMuted(backgroundMusic.muted);
 }
 
 function pickFallingKind() {
@@ -268,10 +302,14 @@ function startGame() {
   gameState = "playing";
   overlayElement.classList.add("hidden");
   updateHud();
+
+  backgroundMusic.currentTime = 0;
+  playMusic();
 }
 
 function endGame() {
   gameState = "over";
+  backgroundMusic.pause();
   if (score > bestScore) {
     bestScore = score;
     saveBestScore(bestScore);
@@ -542,10 +580,14 @@ document.addEventListener("keydown", (event) => {
   if (event.code === "KeyP") {
     if (gameState === "playing") {
       gameState = "paused";
+      backgroundMusic.pause();
     } else if (gameState === "paused") {
       gameState = "playing";
+      playMusic();
     }
   }
+
+  if (event.code === "KeyM" && !event.repeat) toggleMuted();
 
   if (event.code === "Space" && (gameState === "menu" || gameState === "over")) {
     startGame();
@@ -554,6 +596,16 @@ document.addEventListener("keydown", (event) => {
 
 document.addEventListener("keyup", (event) => {
   pressedKeys.delete(event.code);
+});
+
+// requestAnimationFrame stops in a background tab so the game freezes, but audio
+// would keep going on its own without this
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    backgroundMusic.pause();
+  } else if (gameState === "playing") {
+    playMusic();
+  }
 });
 
 canvas.addEventListener("pointermove", (event) => {
