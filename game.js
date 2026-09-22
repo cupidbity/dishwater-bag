@@ -78,6 +78,13 @@ const PLAYER_SPEED = 560;
 const BASE_FALL_SPEED = 170;
 const BASE_SPAWN_INTERVAL = 0.85;
 
+const DIFFICULTY_STEP_SECONDS = 45;
+const DIFFICULTY_STEP = 0.3;
+
+// a cat falling faster than this clears the whole catch band between two frames
+// and is missed through no fault of the player, see the working in the readme
+const MAX_DIFFICULTY = 4.5;
+
 // never ask for more than this fraction of top speed between two catches, so a
 // perfect run never needs frame perfect movement
 const REACH_SAFETY_FACTOR = 0.7;
@@ -153,7 +160,8 @@ function pickFallingKind() {
 }
 
 function difficultyMultiplier() {
-  return 1 + Math.min(elapsedSeconds / 60, 1.25);
+  const step = Math.floor(elapsedSeconds / DIFFICULTY_STEP_SECONDS);
+  return Math.min(1 + step * DIFFICULTY_STEP, MAX_DIFFICULTY);
 }
 
 // objects fall at different speeds, so a new spawn can land between two that
@@ -190,7 +198,9 @@ function pickReachableX(kind, arrivalTime) {
     rightLimit = Math.min(rightLimit, after.x + reachToAfter);
   }
 
-  if (rightLimit < leftLimit) return before.x;
+  // no position between these two neighbours is reachable, so rather than drop a
+  // cat the player cannot get to, spawn nothing and try again next tick
+  if (rightLimit < leftLimit) return null;
   return leftLimit + Math.random() * (rightLimit - leftLimit);
 }
 
@@ -220,6 +230,8 @@ function spawnFallingObject() {
   const x = kind.harmful
     ? pickHazardX(kind, arrivalTime)
     : pickReachableX(kind, arrivalTime);
+
+  if (x === null) return;
 
   if (!kind.harmful) {
     catchCommitments.push({ x, arrivalTime });
